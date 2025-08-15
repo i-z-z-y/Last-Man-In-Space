@@ -3,29 +3,31 @@
 The repository was reviewed file‑by‑file.  Below are recommendations to polish the game, address technical issues and prepare it for a public release.
 
 ## 1. Fix Mode 7 Memory Usage
-- `lib/playmat.lua` creates temporary tables for every sprite via `placeSprite`, which can allocate many tables per frame.  Reuse tables or clear them with `table.clear`/`table.remove` to reduce garbage.
-- Ensure canvases and shaders are reused rather than recreated, and call `collectgarbage` or profiling tools to confirm memory is stable.
-- Consider using sprite batching or Love's `SpriteBatch` to further reduce allocations.
+- `lib/playmat.lua`'s `placeSprite` assembles an argument table and pushes it into `cam.buffer` (`table.insert`) every frame.  These tables are discarded after `renderSprites`, causing steady allocation and memory churn.  Reuse table objects or convert the renderer to operate on a preallocated array.
+- Profile `PM7.drawPlane` and `renderSprites` with a memory tool; ensure the shader and canvas created in `newCamera` are reused across frames.
+- If Playmat remains a bottleneck, replace per‑sprite buffers with `love.graphics.newSpriteBatch` to draw planets and ship sprites efficiently.
 
 ## 2. Reduce Global State
-- Many scripts expose globals (`luacheck` reports 1000+ warnings).  Encapsulate logic in modules or local tables to avoid name clashes and ease testing.
+- Files such as `scripts/gfxload.lua` and each `planets/*.lua` set or rely on globals (`shipDirection`, `shipQUEST`, `camera`, `state`, `passvar`).  Wrap these in modules or local tables and return explicit interfaces.
+- `lib/switch.lua` mutates a global `passvar` table to pass state data.  Consider using Love's built‑in `arg` or a dedicated state machine library to avoid hidden dependencies.
 
 ## 3. Asset Management
-- `planets/data/planets.lua` loads images on require.  Cache assets in a central loader so state changes do not reload textures every visit.
-- Compress or atlas textures to lower memory footprint and load times.
+- `planets/data/planets.lua` calls `love.graphics.newImage` during module load for every planet.  Lazy‑load or share textures via an asset cache so re‑requiring the module does not duplicate Image objects.
+- Audio sources like `sndBGMain` and `sndSHIP` in `main.lua` are created in `love.load` but never released.  Store them in a manager and stop/cleanup on shutdown.
+- Combine small sprite sheets into atlases and provide a manifest to reduce file count and improve loading times.
 
 ## 4. Code Structure and Documentation
-- Organize planet scripts into a unified system or data-driven structure rather than separate files for each planet.
-- Replace hard-coded magic numbers (e.g., coordinates, speeds) with configuration constants.
-- Expand documentation and inline comments describing game flow and engine APIs.
+- Planet interaction logic is duplicated across `planets/planet*.lua`.  Replace with a single handler reading dialogue and quest steps from data tables.
+- Extract repeated numbers such as camera limits (4000–96000) and ship speed (300) in `main.lua` into named constants or configuration files.
+- Add comments describing how `shipQUEST` progresses and how `PM7` integrates with LÖVE to help future contributors.
 
 ## 5. Testing and Tooling
-- Add automated checks (e.g., Luacheck configuration, unit tests for state transitions) to catch regressions.
-- Provide a build script or instructions for packaging the game for Windows, macOS, and Linux.
+- Add automated checks such as a `luacheck` configuration for style and a small test script verifying `state.switch` and planet data.
+- Provide a packaging script (e.g., `make` or Lua script) that assembles a `.love` file and platform‑specific builds for Windows, macOS, and Linux.
 
 ## 6. Gameplay and UX Improvements
-- Add title and pause screens, configurable key bindings, and audio options.
-- Implement save/load functionality and progress tracking.
+- Implement title/pause screens, configurable controls, and audio sliders via `Moan` options.
+- Add save/load or checkpoint support so `shipQUEST` progress and visited planets persist across sessions.
 
 Addressing these items will help stabilize the Mode 7 renderer, reduce memory leaks, and make the project easier to maintain and ship.
 
