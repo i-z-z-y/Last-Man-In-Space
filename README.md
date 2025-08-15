@@ -19,7 +19,9 @@ Every Lua source file was inspected to catalogue third‑party code and the exac
   * `love.graphics.newImage`, `newQuad`, `draw`, `print`, `newCanvas`, and `setShader` for rendering.
   * `love.audio.newSource`, `setVolume`, `play`, `setEffect`, and `setLooping` for music and SFX.
   * `love.keyboard.isDown` and `love.keyreleased` for input polling.
+  * `love.graphics.setBackgroundColor`, `setDefaultFilter`, `getWidth`, and `getHeight` to initialise render state and compute image scaling.
   * `love.mouse.setVisible` to hide the cursor during gameplay.
+  * `love.audio.setEffect` to apply the reverb used by `Moan` sound effects.
   * `love.math.random` and `math` trig helpers inside the camera and ship controls.
   * `love.event.quit` in quit screens and end‑game logic.
 * **Playmat v1.5** (`lib/playmat.lua`) – Mode‑7 renderer with a GLSL shader and a camera object.  Exported functions used in
@@ -30,7 +32,8 @@ Every Lua source file was inspected to catalogue third‑party code and the exac
   advanced each `love.update` tick.
 * **Moan 0.2.9** (`lib/moan.lua`) – Dialogue/message box system.  The project uses `Moan.speak`, `Moan.update`, `Moan.draw`,
   and `Moan.keyreleased` in planet scripts and the quit screen.  The library also exposes configuration fields such as
-  `Moan.font`, `Moan.typeSound`, and `Moan.optionOnSelectSound` that are initialised in `main.lua`.
+  `Moan.font`, `Moan.typeSound`, and `Moan.optionOnSelectSound` that are initialised in `main.lua`, and `Moan.setSpeed` to slow
+  text output for the OJEE teleporter dialogue.
 * **Switch** (`lib/switch.lua`) – Minimal state machine.  `state.switch("file;args")` dynamically reloads a Lua module and
   populates a global `passvar` with trailing semicolon‑delimited arguments.  Planet scripts read `passvar` to obtain the planet
   key and quest information.
@@ -67,6 +70,16 @@ Ensure [LÖVE](https://love2d.org/) is installed and run the game from the repos
 ```bash
 love .
 ```
+
+## Player Feedback
+
+Comments from the Ludum Dare 57 thread highlighted several areas for improvement:
+
+* Movement feels abrupt at short distances because the camera snaps instantly to new positions.
+* Some players were unsure of the controls or objective until experimenting.
+* Returning to Planet Andros after visiting others occasionally crashed the game, pointing to a memory leak in the Mode 7 renderer.
+* Teleporter "OJEE" options do not label destinations, making it easy to lose track of planets.
+* A Linux/macOS build was requested alongside the existing Windows release.
 
 ## License
 

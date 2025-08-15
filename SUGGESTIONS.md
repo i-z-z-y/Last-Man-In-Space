@@ -34,6 +34,13 @@ The repository was reviewed file‑by‑file.  Below are recommendations to poli
 - Create a simple title screen (`state.switch("title")`) that shows instructions before `main.lua` starts the game loop.
 - Allow rebinding of `WASD`, `QE`, and `F` by storing control mappings in a `controls.lua` file and exposing an options menu through `Moan`.
 - Persist `shipQUEST`, `camera.x`, and visited planets using `love.filesystem.write`/`read` so progress survives restarts.
+- Implement camera smoothing or acceleration in `main.lua` so short movements do not snap the view, addressing player reports of janky control.
+- Update `planets/OJEE.lua` to annotate teleport options with destination planet names and highlight sectors the player has already visited.
+- Fix the second conversation on Planet Green that stops mid‑paragraph by revisiting the `shipQUEST` conditional in `planets/planetGreen.lua` and validating `Moan.speak` sequences.
+- Flesh out quest branches for `planets/planetPink.lua` and `planets/planetPurple.lua` so their arcs resolve instead of ending abruptly.
+
+## 7. Cross‑Platform Distribution
+- Provide platform builds beyond Windows.  Create scripts to bundle the `.love` file with Linux and macOS runners and evaluate [Love.js](https://github.com/TannerRogalsky/love.js) for an in‑browser version.
 
 Addressing these items will help stabilize the Mode 7 renderer, reduce memory leaks, and make the project easier to maintain and ship.
 
