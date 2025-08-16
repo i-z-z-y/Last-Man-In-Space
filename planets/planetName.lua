@@ -34,7 +34,7 @@ return function(XY)
     Moan.keyreleased(key)
     if key == "escape" then
        Moan.clearMessages()
-       state.switch("main")
+       state.switch("game")
      end
   end
 end

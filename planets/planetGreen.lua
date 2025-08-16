@@ -9,9 +9,8 @@ return function(XY)
 
   if shipQUEST == 0 then
     shipQUEST = 1
-    Moan.speak(planets[XY]["name"], {"Our planet is in great peril..." ..
-      "our sisters on PLANET PURPLE might be able to help, but we can't get too close because they're made of green anti-matter..."},  {image=avatar})
-    Moan.speak(planets[XY]["name"], {"Can you...--SAVE US?"},  {image=avatar, oncomplete=function() state.switch("main") end})
+    Moan.speak(planets[XY]["name"], {[=[Our planet is in great peril... our sisters on PLANET PURPLE might be able to help, but we can't get too close because they're made of green anti-matter..]=]}, {image=avatar})
+    Moan.speak(planets[XY]["name"], {"Can you...--SAVE US?"},  {image=avatar, oncomplete=function() state.switch("game") end})
   elseif shipQUEST == 1 then
   elseif shipQUEST == 2 then
   elseif shipQUEST == 3 then
@@ -21,7 +20,7 @@ return function(XY)
     shipQUEST = 7
     Moan.speak(planets[XY]["name"], {"We heard you are searching for someone on your old home planet...--" ..
       "You'll need to transmit a secret signal...--We're uploading it to your ship now..--It should help you find your friend on PLANET ANDROS."},  {image=avatar})
-    Moan.speak(planets[XY]["name"], {"PLEASE, HURRY!"},  {image=avatar, oncomplete=function() state.switch("main") end})
+    Moan.speak(planets[XY]["name"], {"PLEASE, HURRY!"},  {image=avatar, oncomplete=function() state.switch("game") end})
   elseif shipQUEST == 7 then
   elseif shipQUEST == 8 then
   elseif shipQUEST == 9 then
@@ -45,7 +44,7 @@ return function(XY)
     Moan.keyreleased(key)
     if key == "escape" then
        Moan.clearMessages()
-       state.switch("main")
+       state.switch("game")
      end
   end
 end

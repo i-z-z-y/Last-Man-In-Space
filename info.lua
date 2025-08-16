@@ -16,7 +16,7 @@ return function(x, y, distance, name)
       love.event.quit()
     end
     if love.keyboard.isDown("0") then
-      state.switch("main")
+      state.switch("game")
     end
   end
 end

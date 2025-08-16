@@ -8,20 +8,20 @@ return function(XY)
   Moan.speak(planets[XY]["name"], {"Hello P!nk World!"},  {image=avatar})
 
   if shipQUEST == 0 then
-    Moan.speak(planets[XY]["name"], {"You can find PLANET GREEN in SECTOR 555,555"},  {image=avatar, oncomplete=function() state.switch("main") end})
+    Moan.speak(planets[XY]["name"], {"You can find PLANET GREEN in SECTOR 555,555"},  {image=avatar, oncomplete=function() state.switch("game") end})
   elseif shipQUEST == 1 then
+    Moan.speak(planets[XY]["name"], {"Maybe PLANET PURPLE knows how to help us."}, {image=avatar, oncomplete=function() state.switch("game") end})
   elseif shipQUEST == 2 then
     shipQUEST = 3
     Moan.speak(planets[XY]["name"], {"Our planet is in great peril..." ..
       "you'll find an old friend on your old home PLANET ANDROS that might be able to help..."},  {image=avatar})
-    Moan.speak(planets[XY]["name"], {"Can you...--SAVE US?"},  {image=avatar, oncomplete=function() state.switch("main") end})
+    Moan.speak(planets[XY]["name"], {"Can you...--SAVE US?"},  {image=avatar, oncomplete=function() state.switch("game") end})
   elseif shipQUEST == 3 then
-  elseif shipQUEST == 4 then
-  elseif shipQUEST == 5 then
-  elseif shipQUEST == 6 then
-  elseif shipQUEST == 7 then
-  elseif shipQUEST == 8 then
+    Moan.speak(planets[XY]["name"], {"Did the traveler on PLANET ANDROS give you clues?"}, {image=avatar, oncomplete=function() state.switch("game") end})
+  elseif shipQUEST == 4 or shipQUEST == 5 or shipQUEST == 6 or shipQUEST == 7 or shipQUEST == 8 then
+    Moan.speak(planets[XY]["name"], {"We're holding on... please hurry!"}, {image=avatar, oncomplete=function() state.switch("game") end})
   elseif shipQUEST == 9 then
+    Moan.speak(planets[XY]["name"], {"Thank you!  Our skies are bright once more."}, {image=avatar, oncomplete=function() state.switch("game") end})
   end
 
   function love.update(dt)
@@ -40,7 +40,7 @@ return function(XY)
     Moan.keyreleased(key)
     if key == "escape" then
        Moan.clearMessages()
-       state.switch("main")
+       state.switch("game")
      end
   end
 end
