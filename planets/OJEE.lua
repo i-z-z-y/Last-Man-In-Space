@@ -7,14 +7,39 @@ return function(XY)
   local avatar = assets.image("assets/sprites/OJeeAvatar2.png")
   Moan.setSpeed(0.01)
 
+  local function sectorOption(x, y)
+    local XY = "X" .. x .. "Y" .. y
+    local planet = planets[XY]
+    local label
+    if planet then
+      label = string.format("%s - [SECTOR] ( %d, %d )", planet.name, planet.x/100, planet.y/100)
+      if planet.visited then
+        label = label .. " [VISITED]"
+      end
+    else
+      label = string.format("[SECTOR] ( %d, %d )", x/100, y/100)
+    end
+    return {label, function() camera.x = x; camera.y = y end}
+  end
+
   local options={
-               {"[SECTOR] ( 50, 50 )",  function() camera.x=5000 camera.y=5000 end},
-               {"[SECTOR] ( 50, 950 )",  function() camera.x=5000 camera.y=95000 end},
-               {"[SECTOR] ( 950, 50 )",  function() camera.x=95000 camera.y=5000 end},
-               {"[SECTOR] ( 950, 950 )",  function() camera.x=95000 camera.y=95000 end},
-               {"[SECTOR] ( 555, 555 ) -- GREEN HOME SWEET HOME!",  function() camera.x=55555 camera.y=55555 end}
+               sectorOption(5000, 5000),
+               sectorOption(5000, 95000),
+               sectorOption(95000, 5000),
+               sectorOption(95000, 95000),
+               sectorOption(55555, 55555)
         }
-  Moan.speak({"O J E E", {255,69,0}},{"HiBBiDDi--BOBiDDi--BOO!","CHOOSE WiSELY--YOU!"},{x=10, y=10, options=options, image=avatar,onstart=function() Moan.setSpeed(0.1) end, oncomplete=function() state.switch("main") end,})
+    Moan.speak(
+      {"O J E E", {255,69,0}},
+      {"HiBBiDDi--BOBiDDi--BOO!","CHOOSE WiSELY--YOU!"},
+      {
+        x=10,
+        y=10,
+        options=options,
+        image=avatar,
+        onstart=function() Moan.setSpeed(0.1) end,
+        oncomplete=function() state.switch("main") end,
+      })
 
   function love.update(dt)
     Moan.update(dt)

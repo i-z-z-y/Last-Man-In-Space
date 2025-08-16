@@ -10,6 +10,7 @@ local CAMERA_MIN = 4000
 local CAMERA_MAX = 96000
 local SHIP_SPEED = 300  -- base ship speed
 local ANIM_FRAME_TIME = 0.125 -- seconds per frame (8 FPS)
+local CAMERA_SMOOTHING = 5 -- camera acceleration factor
 
 local imgPLANE7, imgBG, spriteimg, imgCOMPASS, imgSHIP0, imgSHIP1
 local aniSHIP0, aniSHIP1
@@ -20,6 +21,7 @@ shipQUEST = shipQUEST or 0
 local shipDirection = 0
 local shipROT = 0
 local shipOFF = 200
+local camVX, camVY = 0, 0 -- camera velocity
 
 local function setup()
         love.graphics.setBackgroundColor(0,0,0)
@@ -89,44 +91,56 @@ function love.update(dt)
                 end
         end
         --  K E Y S  -----------------------------------------------
-        if not (camera.x < CAMERA_MIN or camera.x > CAMERA_MAX or camera.y < CAMERA_MIN or camera.y > CAMERA_MAX) then
+        local outOfBounds = camera.x < CAMERA_MIN or camera.x > CAMERA_MAX or camera.y < CAMERA_MIN or camera.y > CAMERA_MAX
+        local targetVX, targetVY = 0, 0
+        if not outOfBounds then
           if love.keyboard.isDown("q") then
             camera:setRotation(camera:getRotation()-dt)
-                        shipROT = -0.5
+            shipROT = -0.5
           elseif love.keyboard.isDown("e") then
             camera:setRotation(camera:getRotation()+dt)
-                        shipROT = 0.5
+            shipROT = 0.5
           end
           if love.keyboard.isDown("w") then
-            camera.x=camera.x+math.cos(camera.r)*SHIP_SPEED*dt
-            camera.y=camera.y+math.sin(camera.r)*SHIP_SPEED*dt
-                        shipDirection = 1
-                        sndSHIP:play()
-          elseif  love.keyboard.isDown("s") then
-            camera.x=camera.x-math.cos(camera.r)*SHIP_SPEED*dt*0.15
-            camera.y=camera.y-math.sin(camera.r)*SHIP_SPEED*dt*0.15
+            targetVX = targetVX + math.cos(camera.r)*SHIP_SPEED
+            targetVY = targetVY + math.sin(camera.r)*SHIP_SPEED
+            shipDirection = 1
+            sndSHIP:play()
+          elseif love.keyboard.isDown("s") then
+            targetVX = targetVX - math.cos(camera.r)*SHIP_SPEED*0.15
+            targetVY = targetVY - math.sin(camera.r)*SHIP_SPEED*0.15
           end
 
           if love.keyboard.isDown("a") then
-            camera.x=camera.x+math.cos(camera.r-math.pi/2)*SHIP_SPEED*dt*0.15
-            camera.y=camera.y+math.sin(camera.r-math.pi/2)*SHIP_SPEED*dt*0.15
-          elseif  love.keyboard.isDown("d") then
-            camera.x=camera.x+math.cos(camera.r+math.pi/2)*SHIP_SPEED*dt*0.15
-            camera.y=camera.y+math.sin(camera.r+math.pi/2)*SHIP_SPEED*dt*0.15
+            targetVX = targetVX + math.cos(camera.r-math.pi/2)*SHIP_SPEED*0.15
+            targetVY = targetVY + math.sin(camera.r-math.pi/2)*SHIP_SPEED*0.15
+          elseif love.keyboard.isDown("d") then
+            targetVX = targetVX + math.cos(camera.r+math.pi/2)*SHIP_SPEED*0.15
+            targetVY = targetVY + math.sin(camera.r+math.pi/2)*SHIP_SPEED*0.15
           end
-        else
-                if camera.x < CAMERA_MIN then
-                        camera.x = CAMERA_MIN + 1
-                end
-                if camera.x > CAMERA_MAX then
-                        camera.x = CAMERA_MAX - 1
-                end
-                if               camera.y < CAMERA_MIN then
-                        camera.y = CAMERA_MIN + 1
-                end
-                if               camera.y > CAMERA_MAX then
-                        camera.y = CAMERA_MAX - 1
-                end
+        end
+
+        camVX = camVX + (targetVX - camVX) * CAMERA_SMOOTHING * dt
+        camVY = camVY + (targetVY - camVY) * CAMERA_SMOOTHING * dt
+
+        camera.x = camera.x + camVX * dt
+        camera.y = camera.y + camVY * dt
+
+        if camera.x < CAMERA_MIN then
+            camera.x = CAMERA_MIN + 1
+            camVX = 0
+        end
+        if camera.x > CAMERA_MAX then
+            camera.x = CAMERA_MAX - 1
+            camVX = 0
+        end
+        if camera.y < CAMERA_MIN then
+            camera.y = CAMERA_MIN + 1
+            camVY = 0
+        end
+        if camera.y > CAMERA_MAX then
+            camera.y = CAMERA_MAX - 1
+            camVY = 0
         end
 
           if love.keyboard.isDown("escape") then
@@ -206,6 +220,7 @@ function action()
         for k,v in pairs(planets) do
                 local distance = distance(planets[k]["x"],planets[k]["y"], camera.x, camera.y)
                 if distance < 100 and planets[k]["live"] == true then
+                        planets[k].visited = true
                         state.switch(planets[k]["state"], k)
                 end
         end
