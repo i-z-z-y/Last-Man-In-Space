@@ -38,7 +38,7 @@ return function(XY)
         options=options,
         image=avatar,
         onstart=function() Moan.setSpeed(0.1) end,
-        oncomplete=function() state.switch("main") end,
+        oncomplete=function() state.switch("game") end,
       })
 
   function love.update(dt)
@@ -56,11 +56,11 @@ return function(XY)
     Moan.keyreleased(key)
      if key == "0" then
        Moan.clearMessages()
-       state.switch("main")
+       state.switch("game")
      end
      if key == "escape" then
         Moan.clearMessages()
-        state.switch("main")
+        state.switch("game")
       end
   end
 end

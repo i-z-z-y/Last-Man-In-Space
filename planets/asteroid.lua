@@ -18,7 +18,7 @@ return function(XY)
   elseif shipQUEST == 8 then
     shipQUEST = 9
     planets[XY]["live"] = false
-    Moan.speak(planets[XY]["name"], {"There's something here...--I think we can save PLANET GREEN...--we'll have to destroy the asteroid, but it might work.  Let's go to PLANET GREEN!"}, {image=avatar, oncomplete=function() state.switch("main") end})
+    Moan.speak(planets[XY]["name"], {"There's something here...--I think we can save PLANET GREEN...--we'll have to destroy the asteroid, but it might work.  Let's go to PLANET GREEN!"}, {image=avatar, oncomplete=function() state.switch("game") end})
   elseif shipQUEST == 9 then
   end
 
@@ -38,7 +38,7 @@ return function(XY)
     Moan.keyreleased(key)
     if key == "escape" then
        Moan.clearMessages()
-       state.switch("main")
+       state.switch("game")
      end
   end
 end

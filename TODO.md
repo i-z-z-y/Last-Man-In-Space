@@ -32,11 +32,11 @@ Detailed action items derived from the code review and `SUGGESTIONS.md`.  Comple
 - [ ] Set up build scripts to bundle the `.love` with Linux and macOS runners; evaluate Love.js for a browser build.
 
 ## Gameplay and UX
-- [ ] Build a title screen state with instructions and a menu to start or quit the game.
+- [x] Build a title screen state with instructions and a menu to start or quit the game.
 - [ ] Add configurable key bindings stored in a `controls.lua` file and accessible via an options menu implemented with `Moan`.
 - [ ] Persist `shipQUEST`, `camera` position, and visited planets using `love.filesystem` so progress survives restarts.
 - [x] Apply camera smoothing/acceleration in `main.lua` to prevent abrupt jumps when moving short distances.
 - [x] Extend `planets/OJEE.lua` to label warp options with planet names and mark previously visited sectors.
-- [ ] Investigate and fix the truncated second dialogue on Planet Green by reviewing `shipQUEST` branches and `Moan.speak` calls in `planets/planetGreen.lua`.
-- [ ] Complete dialogue/quest logic for `planets/planetPink.lua` and `planets/planetPurple.lua` so their stories resolve.
+- [x] Investigate and fix the truncated second dialogue on Planet Green by reviewing `shipQUEST` branches and `Moan.speak` calls in `planets/planetGreen.lua`.
+- [x] Complete dialogue/quest logic for `planets/planetPink.lua` and `planets/planetPurple.lua` so their stories resolve.
 
