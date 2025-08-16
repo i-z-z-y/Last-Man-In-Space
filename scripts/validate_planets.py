@@ -30,10 +30,10 @@ def parse_planets():
                     entries.append(current)
                     current = None
                     continue
-                m = re.search(r'img=love\.graphics\.newImage\("([^"]+)"\)', stripped)
+                m = re.search(r'img=(?:assets\.image|love\.graphics\.newImage)\("([^"]+)"\)', stripped)
                 if m:
                     current['img'] = m.group(1)
-                m = re.search(r'imgPS=love\.graphics\.newImage\("([^"]+)"\)', stripped)
+                m = re.search(r'imgPS=(?:assets\.image|love\.graphics\.newImage)\("([^"]+)"\)', stripped)
                 if m:
                     current['imgPS'] = m.group(1)
                 m = re.search(r'quadWidth=(\d+)', stripped)
