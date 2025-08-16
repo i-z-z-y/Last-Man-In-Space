@@ -71,6 +71,21 @@ Ensure [LÖVE](https://love2d.org/) is installed and run the game from the repos
 love .
 ```
 
+## Quest Progression
+
+Story progress is tracked by a single `shipQUEST` integer.  Each planet
+updates the value when visited in a particular order:
+
+1. Start at **Planet Andros** (`shipQUEST` = 0).
+2. Visit **Planet Green** → `shipQUEST` becomes 1.
+3. Visit **Planet Purple** → `shipQUEST` becomes 2.
+4. Visit **Planet Pink** → `shipQUEST` becomes 3.
+5. Revisit **Planet Andros** three times → progresses to 4, 5 and 6.
+6. Return to **Planet Green** → `shipQUEST` becomes 7 and uploads a signal.
+7. Visit **Planet Andros** again → `shipQUEST` becomes 8.
+8. Destroy the **asteroid** in sector 5555 → `shipQUEST` becomes 9.
+9. Final visit to **Planet Green** ends the game.
+
 ## Player Feedback
 
 Comments from the Ludum Dare 57 thread highlighted several areas for improvement:
