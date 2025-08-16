@@ -1,42 +1,46 @@
 # Production Tasks
 
-Detailed action items derived from the code review and `SUGGESTIONS.md`.  Completing these will prepare *Last Man In Space* for a production release.
+Action items extracted from `SUGGESTIONS.md`.  Completing these will bring *Last Man In Space* to a releasable state.
 
-## Mode 7 / Playmat Memory Leak
-- [x] Refactor `lib/playmat.lua` `placeSprite` to reuse sprite records instead of creating a new table per sprite each frame.
-- [x] Ensure `PM7.newCamera` only creates one `rendercanvas`; add a teardown path to release the canvas on shutdown.
-- [x] Benchmark `PM7.drawPlane` and `PM7.renderSprites` with `love.graphics.getStats()` and document memory numbers before/after optimisation.
-- [x] Prototype a `love.graphics.newSpriteBatch` renderer and compare performance to the current buffer approach.
+## Renderer and Performance
+- [ ] Compare `lib.playmat.renderSprites` with `renderSpritesBatch` and adopt the faster variant.
+- [ ] Ensure `game.lua` calls `PM7.destroyCamera()` on shutdown and document the API.
+- [ ] Integrate `scripts/benchmark_pm7.lua` into CI and track `love.graphics.getStats()` output.
 
-## Global State Cleanup
-- [x] Convert `scripts/gfxload.lua` into a module that returns images, animations, and a `setupCamera` function instead of setting globals.
-- [x] Replace `lib/switch.lua` and `passvar` with a state manager that passes arguments explicitly.  Update `main.lua`, `info.lua`, and `planets/*.lua` accordingly.
-- [x] Implement a `Planet` handler module so individual `planets/planet*.lua` scripts can be data‑driven.
+## Input and Options
+- [ ] Escape and quote key names when writing `controls.conf` to avoid corrupt files.
+- [ ] Detect conflicting key assignments in `controls.set` and add a "reset defaults" option.
+- [ ] In `options.lua`, allow cancelling a rebind with `escape` and redraw the menu immediately.
+- [ ] Show the current binding while awaiting input so players know what is being changed.
 
-## Asset Management
-- [x] Introduce an `assets.lua` cache.  Modify `planets/data/planets.lua` and `scripts/gfxload.lua` to request images through this cache.
-- [x] Add shutdown code in `main.lua` to stop and release `sndBGMain` and `sndSHIP`.
-- [x] Merge sprite sheets into atlases and update `anim8.newGrid` calls to use atlas coordinates.
-- [x] Track and reuse fonts (`JPfallback.ttf`, `Pixel UniCode.ttf`) through the asset cache.
+## Persistence
+- [ ] Replace the custom `serialize` function in `game.lua` with JSON (e.g. `dkjson`).
+- [ ] Validate loaded save data and back up the previous file before overwriting.
+- [ ] Move `visited` flags into `planets/data/planets.lua` instead of adding fields at runtime.
 
-## Code Structure and Documentation
-- [x] Replace duplicated planet scripts with a generic `planet_scene.lua` that reads quest/dialogue data from `planets/data/planets.lua`.
-- [x] Introduce constants for camera bounds, ship speed, and animation timings in `main.lua` and reference them everywhere.
-- [x] Expand comments in `lib/playmat.lua` explaining shader variables and `cam` fields.
-- [x] Document `shipQUEST` progression in `README.md` and code comments.
+## Assets
+- [ ] Add `assets.clear()` to release cached images/fonts and call it from `love.quit`.
+- [ ] Release the temporary canvas in `scripts/gfxload.lua` after building the ship atlas.
+- [ ] Deduplicate planet background images by referencing shared assets.
 
-## Testing and Packaging
-- [x] Add `.luacheckrc` and integrate `luacheck` into CI to catch globals and style issues.
-- [x] Write a validation script for `planets/data/planets.lua` ensuring each entry has `img`, `imgPS`, and valid quad dimensions.
-- [x] Create a `Makefile` or `build.lua` that packages the project into a `.love` file and optional platform executables.
-- [x] Set up build scripts to bundle the `.love` with Linux and macOS runners; evaluate Love.js for a browser build.
+## Code Structure
+- [ ] Extract gameplay constants from `game.lua` into a configuration module.
+- [ ] Document the `controls.conf` format and default mappings in `README.md`.
+- [ ] Comment the expected `config` structure in `planets/planet_scene.lua`.
+- [ ] Remove or refactor `info.lua` to reuse logic from `planet_scene.lua`.
+
+## Testing
+- [ ] Add a `.luacheckrc` and run `luacheck` in the build pipeline.
+- [ ] Extend `scripts/validate_planets.py` to check `quadState`, `imgSX` and `imgSY` ranges.
+- [ ] Write unit tests for `controls.lua` load/save behaviour.
 
 ## Gameplay and UX
-- [x] Build a title screen state with instructions and a menu to start or quit the game.
-- [x] Add configurable key bindings stored in a `controls.lua` file and accessible via an options menu implemented with `Moan`.
-- [x] Persist `shipQUEST`, `camera` position, and visited planets using `love.filesystem` so progress survives restarts.
-- [x] Apply camera smoothing/acceleration in `main.lua` to prevent abrupt jumps when moving short distances.
-- [x] Extend `planets/OJEE.lua` to label warp options with planet names and mark previously visited sectors.
-- [x] Investigate and fix the truncated second dialogue on Planet Green by reviewing `shipQUEST` branches and `Moan.speak` calls in `planets/planetGreen.lua`.
-- [x] Complete dialogue/quest logic for `planets/planetPink.lua` and `planets/planetPurple.lua` so their stories resolve.
+- [ ] Implement camera acceleration for smoother short movements.
+- [ ] Highlight the selected teleporter destination and allow instant cancel with `escape`.
+- [ ] Add background art, music and version text to `title.lua`.
+- [ ] Play an effect whenever `shipQUEST` advances to reinforce progression.
 
+## Build and Distribution
+- [ ] Cache downloaded Love2D binaries in the `Makefile` and verify checksums.
+- [ ] Create a `make test` target that runs linters and validation scripts before packaging.
+- [ ] Note Python 3 and Pillow as prerequisites in the README.
