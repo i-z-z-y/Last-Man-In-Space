@@ -3,6 +3,7 @@ local PM7 = require "lib.playmat"
 local anim8 = require 'lib.anim8'
 local Moan = require('lib.moan')
 local assets = require("assets")
+local controls = require('controls')
 
 planets = require('planets.data.planets')
 -- gameplay constants
@@ -23,7 +24,56 @@ local shipROT = 0
 local shipOFF = 200
 local camVX, camVY = 0, 0 -- camera velocity
 
+local function serialize(tbl, indent)
+        indent = indent or ""
+        local nextIndent = indent .. "  "
+        local parts = {"{\n"}
+        for k,v in pairs(tbl) do
+                local key = type(k) == "string" and string.format('%q', k) or k
+                table.insert(parts, nextIndent .. "[" .. key .. "] = ")
+                if type(v) == "table" then
+                        table.insert(parts, serialize(v, nextIndent))
+                elseif type(v) == "string" then
+                        table.insert(parts, string.format('%q', v))
+                else
+                        table.insert(parts, tostring(v))
+                end
+                table.insert(parts, ",\n")
+        end
+        table.insert(parts, indent .. "}")
+        return table.concat(parts)
+end
+
+local function saveProgress()
+        if not camera then return end
+        local data = { shipQUEST = shipQUEST, camera = {x=camera.x, y=camera.y}, visited = {} }
+        for k,v in pairs(planets) do
+                if v.visited then data.visited[k] = true end
+        end
+        love.filesystem.write('save.lua', 'return ' .. serialize(data))
+end
+
+local function loadProgress()
+        local chunk = love.filesystem.load('save.lua')
+        if chunk then
+                local ok, data = pcall(chunk)
+                if ok and type(data) == 'table' then
+                        shipQUEST = data.shipQUEST or shipQUEST
+                        if data.camera then
+                                camera.x = data.camera.x or camera.x
+                                camera.y = data.camera.y or camera.y
+                        end
+                        if data.visited then
+                                for k,_ in pairs(data.visited) do
+                                        if planets[k] then planets[k].visited = true end
+                                end
+                        end
+                end
+        end
+end
+
 local function setup()
+        controls.load()
         love.graphics.setBackgroundColor(0,0,0)
         love.graphics.setDefaultFilter("nearest","nearest")
         Moan.setSpeed(0.1)
@@ -40,6 +90,7 @@ local function setup()
         aniSHIP1 = gfx.animations.aniSHIP1
         camera = gfx.setupCamera()
         camera.x, camera.y = 5000,5000
+        loadProgress()
         sndBGMain = love.audio.newSource("assets/music.ogg", "stream")
         sndBGMain:setVolume(0.11)
         sndBGMain:setLooping(true)
@@ -90,27 +141,27 @@ function love.update(dt)
         local outOfBounds = camera.x < CAMERA_MIN or camera.x > CAMERA_MAX or camera.y < CAMERA_MIN or camera.y > CAMERA_MAX
         local targetVX, targetVY = 0, 0
         if not outOfBounds then
-          if love.keyboard.isDown("q") then
+          if love.keyboard.isDown(controls.get('turnLeft')) then
             camera:setRotation(camera:getRotation()-dt)
             shipROT = -0.5
-          elseif love.keyboard.isDown("e") then
+          elseif love.keyboard.isDown(controls.get('turnRight')) then
             camera:setRotation(camera:getRotation()+dt)
             shipROT = 0.5
           end
-          if love.keyboard.isDown("w") then
+          if love.keyboard.isDown(controls.get('up')) then
             targetVX = targetVX + math.cos(camera.r)*SHIP_SPEED
             targetVY = targetVY + math.sin(camera.r)*SHIP_SPEED
             shipDirection = 1
             sndSHIP:play()
-          elseif love.keyboard.isDown("s") then
+          elseif love.keyboard.isDown(controls.get('down')) then
             targetVX = targetVX - math.cos(camera.r)*SHIP_SPEED*0.15
             targetVY = targetVY - math.sin(camera.r)*SHIP_SPEED*0.15
           end
 
-          if love.keyboard.isDown("a") then
+          if love.keyboard.isDown(controls.get('left')) then
             targetVX = targetVX + math.cos(camera.r-math.pi/2)*SHIP_SPEED*0.15
             targetVY = targetVY + math.sin(camera.r-math.pi/2)*SHIP_SPEED*0.15
-          elseif love.keyboard.isDown("d") then
+          elseif love.keyboard.isDown(controls.get('right')) then
             targetVX = targetVX + math.cos(camera.r+math.pi/2)*SHIP_SPEED*0.15
             targetVY = targetVY + math.sin(camera.r+math.pi/2)*SHIP_SPEED*0.15
           end
@@ -143,7 +194,7 @@ function love.update(dt)
                         state.switch("quit")
           end
 
-          if love.keyboard.isDown("f") then
+          if love.keyboard.isDown(controls.get('action')) then
             action()
           end
 end
@@ -205,11 +256,11 @@ end
 
 function love.keyreleased(key)
     Moan.keyreleased(key) -- or Moan.keypressed(key)
-                if key == "w" then
-                        shipDirection = 0
-                end
-                sndSHIP:stop()
-                shipROT = 0
+    if key == controls.get('up') then
+        shipDirection = 0
+    end
+    sndSHIP:stop()
+    shipROT = 0
 end
 
 function action()
@@ -234,6 +285,7 @@ function updateQuadState(a)
 end
 
 function love.quit()
+    saveProgress()
     if sndBGMain then
         sndBGMain:stop()
         sndBGMain:release()

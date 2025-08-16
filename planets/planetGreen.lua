@@ -1,50 +1,25 @@
-local state = require "lib.state"
-local assets = require("assets")
+local state = require 'lib.state'
+local scene = require('planets.planet_scene')
 
-return function(XY)
-  XY = tostring(XY)
-  local imgBackGround = planets[XY]["imgPS"]
-  local avatar = assets.image("assets/avatars/planetGreenAvatar.png")
-  Moan.speak(planets[XY]["name"], {"Hello Green World!"},  {image=avatar})
-
-  if shipQUEST == 0 then
-    shipQUEST = 1
-    Moan.speak(planets[XY]["name"], {[=[Our planet is in great peril... our sisters on PLANET PURPLE might be able to help, but we can't get too close because they're made of green anti-matter..]=]}, {image=avatar})
-    Moan.speak(planets[XY]["name"], {"Can you...--SAVE US?"},  {image=avatar, oncomplete=function() state.switch("game") end})
-  elseif shipQUEST == 1 then
-  elseif shipQUEST == 2 then
-  elseif shipQUEST == 3 then
-  elseif shipQUEST == 4 then
-  elseif shipQUEST == 5 then
-  elseif shipQUEST == 6 then
-    shipQUEST = 7
-    Moan.speak(planets[XY]["name"], {"We heard you are searching for someone on your old home planet...--" ..
-      "You'll need to transmit a secret signal...--We're uploading it to your ship now..--It should help you find your friend on PLANET ANDROS."},  {image=avatar})
-    Moan.speak(planets[XY]["name"], {"PLEASE, HURRY!"},  {image=avatar, oncomplete=function() state.switch("game") end})
-  elseif shipQUEST == 7 then
-  elseif shipQUEST == 8 then
-  elseif shipQUEST == 9 then
-    Moan.speak(planets[XY]["name"], {"That's it!  OUR PLANET is SAFE NOW!  Please, land your ship and join us.  We have prepared a feast in your honor! ;-)"}, {image=avatar})
-    Moan.speak(planets[XY]["name"], {"GAME--OVER"}, {image=avatar, oncomplete=function() love.event.quit() end})
-  end
-
-  function love.update(dt)
-    Moan.update(dt)
-  end
-
-  function love.draw()
-    local sx = love.graphics.getWidth() / imgBackGround:getWidth()
-    local sy = love.graphics.getHeight() / imgBackGround:getHeight()
-    love.graphics.draw(imgBackGround, 0, 0, 0, sx, sy)
-    love.graphics.print("Press ESCAPE to go back...")
-    Moan.draw()
-  end
-
-  function love.keyreleased(key)
-    Moan.keyreleased(key)
-    if key == "escape" then
-       Moan.clearMessages()
-       state.switch("game")
-     end
-  end
-end
+return scene({
+    avatar = 'assets/avatars/planetGreenAvatar.png',
+    intro = {
+        {lines = {"Hello Green World!"}}
+    },
+    dialogue = {
+        [0] = {
+            {before=function() shipQUEST = 1 end,
+             lines={[=[Our planet is in great peril... our sisters on PLANET PURPLE might be able to help, but we can't get too close because they're made of green anti-matter..]=]}},
+            {lines={"Can you...--SAVE US?"}, oncomplete=function() state.switch('game') end}
+        },
+        [6] = {
+            {before=function() shipQUEST = 7 end,
+             lines={"We heard you are searching for someone on your old home planet...--You'll need to transmit a secret signal...--We're uploading it to your ship now..--It should help you find your friend on PLANET ANDROS."}},
+            {lines={"PLEASE, HURRY!"}, oncomplete=function() state.switch('game') end}
+        },
+        [9] = {
+            {lines={"That's it!  OUR PLANET is SAFE NOW!  Please, land your ship and join us.  We have prepared a feast in your honor! ;-)"}},
+            {lines={"GAME--OVER"}, oncomplete=function() love.event.quit() end}
+        }
+    }
+})

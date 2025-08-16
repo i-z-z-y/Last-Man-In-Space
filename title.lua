@@ -1,7 +1,7 @@
 local state = require "lib.state"
 
 return function()
-    local options = {"Start", "Quit"}
+    local options = {"Start", "Options", "Quit"}
     local index = 1
 
     function love.keypressed(key)
@@ -14,6 +14,8 @@ return function()
         elseif key == "return" or key == "space" then
             if index == 1 then
                 state.switch("game")
+            elseif index == 2 then
+                state.switch("options")
             else
                 love.event.quit()
             end

@@ -98,6 +98,7 @@ local function newCamera(sw,sh,x,y,r,z,f,o)
                 y2=0,
                 buffer={},
                 pool={},
+                batches={},
                 setRotation = setRotation,
                 setPosition = setPosition,
                 setZoom = setZoom,
@@ -290,5 +291,51 @@ PM.toScreen = toScreen
 PM.toWorld = toWorld
 PM.placeSprite = placeSprite
 PM.renderSprites = renderSprites
+
+-- experimental spritebatch renderer for benchmarking
+local function renderSpritesBatch(cam)
+        if cam.buffer and #cam.buffer > 0 then
+                -- clear existing batches
+                for _, batch in pairs(cam.batches) do
+                        batch:clear()
+                end
+
+                sort(cam.buffer,function(a,b) return a.dist < b.dist end)
+
+                for i=#cam.buffer,1,-1 do
+                        local arg = cam.buffer[i]
+                        local img = arg[1]
+                        local q = type(arg[2]) ~= "number" and 1 or 0
+                        local batch = cam.batches[img]
+                        if not batch then
+                                batch = lg.newSpriteBatch(img, #cam.buffer)
+                                cam.batches[img] = batch
+                        end
+
+                        if arg.color then
+                                batch:setColor(unpack(arg.color))
+                        else
+                                batch:setColor(1,1,1,1)
+                        end
+
+                        if q == 1 then
+                                batch:add(arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8])
+                        else
+                                batch:add(arg[2], arg[3], arg[4], arg[5], arg[6], arg[7])
+                        end
+
+                        arg.color = nil
+                        arg.dist = nil
+                        cam.buffer[i] = nil
+                        cam.pool[#cam.pool+1] = arg
+                end
+
+                for _, batch in pairs(cam.batches) do
+                        lg.draw(batch)
+                end
+        end
+end
+
+PM.renderSpritesBatch = renderSpritesBatch
 
 return PM

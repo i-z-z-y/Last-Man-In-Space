@@ -13,11 +13,19 @@ function M.load()
 
     -- ship animations
     local imgSHIP0 = assets.image("assets/sprites/ship0.png")
-    local gridSHIP0 = anim8.newGrid(400, 400, imgSHIP0:getWidth(), imgSHIP0:getHeight())
-    local aniSHIP0 = anim8.newAnimation(gridSHIP0('1-8',1), 0.2)
-
     local imgSHIP1 = assets.image("assets/sprites/ship1.png")
-    local gridSHIP1 = anim8.newGrid(400, 400, imgSHIP1:getWidth(), imgSHIP1:getHeight())
+    local atlasCanvas = love.graphics.newCanvas(imgSHIP0:getWidth()+imgSHIP1:getWidth(), math.max(imgSHIP0:getHeight(), imgSHIP1:getHeight()))
+    love.graphics.setCanvas(atlasCanvas)
+    love.graphics.draw(imgSHIP0,0,0)
+    love.graphics.draw(imgSHIP1,imgSHIP0:getWidth(),0)
+    love.graphics.setCanvas()
+    local atlas = love.graphics.newImage(atlasCanvas:newImageData())
+    imgSHIP0:release()
+    imgSHIP1:release()
+
+    local gridSHIP0 = anim8.newGrid(400, 400, atlas:getWidth(), atlas:getHeight(), 0, 0)
+    local gridSHIP1 = anim8.newGrid(400, 400, atlas:getWidth(), atlas:getHeight(), imgSHIP0:getWidth(), 0)
+    local aniSHIP0 = anim8.newAnimation(gridSHIP0('1-8',1), 0.2)
     local aniSHIP1 = anim8.newAnimation(gridSHIP1('1-4',1), 0.2)
 
     local function setupCamera()
@@ -34,8 +42,8 @@ function M.load()
             imgBG = imgBG,
             spriteimg = spriteimg,
             imgCOMPASS = imgCOMPASS,
-            imgSHIP0 = imgSHIP0,
-            imgSHIP1 = imgSHIP1
+            imgSHIP0 = atlas,
+            imgSHIP1 = atlas
         },
         animations = {
             aniSHIP0 = aniSHIP0,
