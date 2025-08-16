@@ -3,6 +3,18 @@ shipROT = 0
 shipOFF = 200
 shipQUEST = 0
 
+-- Quest progression values:
+--   0  start on Planet Andros
+--   1  visit Planet Green to begin the quest
+--   2  help Planet Purple
+--   3  assist Planet Pink
+--   4  search Planet Andros again
+--   5  keep searching Planet Andros
+--   6  still searching Planet Andros
+--   7  return to Planet Green for a signal
+--   8  final visit to Planet Andros
+--   9  destroy the asteroid and finish on Planet Green
+
 --BASiC
 love.graphics.setBackgroundColor(0,0,0)
 love.graphics.setDefaultFilter("nearest","nearest")

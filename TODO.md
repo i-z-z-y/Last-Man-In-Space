@@ -23,12 +23,12 @@ Detailed action items derived from the code review and `SUGGESTIONS.md`.  Comple
 - [ ] Replace duplicated planet scripts with a generic `planet_scene.lua` that reads quest/dialogue data from `planets/data/planets.lua`.
 - [x] Introduce constants for camera bounds, ship speed, and animation timings in `main.lua` and reference them everywhere.
 - [x] Expand comments in `lib/playmat.lua` explaining shader variables and `cam` fields.
-- [ ] Document `shipQUEST` progression in `README.md` and code comments.
+- [x] Document `shipQUEST` progression in `README.md` and code comments.
 
 ## Testing and Packaging
 - [x] Add `.luacheckrc` and integrate `luacheck` into CI to catch globals and style issues.
-- [ ] Write a validation script for `planets/data/planets.lua` ensuring each entry has `img`, `imgPS`, and valid quad dimensions.
-- [ ] Create a `Makefile` or `build.lua` that packages the project into a `.love` file and optional platform executables.
+- [x] Write a validation script for `planets/data/planets.lua` ensuring each entry has `img`, `imgPS`, and valid quad dimensions.
+- [x] Create a `Makefile` or `build.lua` that packages the project into a `.love` file and optional platform executables.
 - [ ] Set up build scripts to bundle the `.love` with Linux and macOS runners; evaluate Love.js for a browser build.
 
 ## Gameplay and UX
