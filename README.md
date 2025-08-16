@@ -4,12 +4,20 @@ Last Man In Space is a 2D space exploration demo built with the [LÖVE](https://
 
 ## Game Structure
 
-- `main.lua` – core game loop, input handling, camera control and Mode 7 drawing.
-- `info.lua` – displays planet information.
+The project was examined file by file.  Key modules include:
+
+- `main.lua` – entry point that immediately swaps to the `title` state.
+- `title.lua` – simple menu letting players start the game, open the options menu, or quit.
+- `game.lua` – core gameplay loop, ship and camera movement, save/load logic, and audio setup.
+- `options.lua` – in‑game menu for rebinding keys.
+- `controls.lua` – persistent key bindings stored in `controls.conf` using `love.filesystem`.
+- `assets.lua` – image and font cache so resources are only created once.
+- `info.lua` – displays coordinates and planet name.
 - `quit.lua` – exit confirmation screen.
-- `scripts/` – helper scripts such as `gfxload.lua` for loading graphics and setting up the camera.
+- `scripts/` – utility scripts such as `gfxload.lua` (graphics loader/camera factory), `benchmark_pm7.lua` (Playmat memory benchmark) and `validate_planets.py` (dataset validator).
 - `planets/` – individual Lua files for each planet or asteroid and a `data/planets.lua` dataset describing their positions and sprites.
-- `lib/` – third-party libraries and lightweight utilities.
+- `lib/` – third‑party libraries and lightweight utilities.
+- `Makefile` – packages the project into a `.love` file and platform bundles.
 
 ## Libraries and Frameworks
 
@@ -44,9 +52,15 @@ Every Lua source file was inspected to catalogue third‑party code and the exac
 | --- | --- | --- |
 | `conf.lua` | Configures window title, resize behaviour, and fullscreen. | `love.conf` |
 | `info.lua` | Shows coordinates and planet name passed in explicitly. | `state`, `love.graphics`, `love.keyboard` |
-| `main.lua` | Game loop, camera control, audio, and Mode 7 drawing. | `state`, `PM7`, `anim8`, `Moan`, `love.graphics`, `love.audio`, `love.keyboard`, `love.math`, `love.event` |
+| `main.lua` | Entry point that loads the title screen. | `state` |
+| `title.lua` | Basic menu for starting the game, rebinding controls, or quitting. | `state`, `love.graphics`, `love.keyboard`, `love.event` |
+| `game.lua` | Ship movement, camera control, save/load, Mode 7 drawing, and audio playback. | `state`, `PM7`, `anim8`, `Moan`, `assets`, `controls`, `love.graphics`, `love.audio`, `love.keyboard`, `love.math`, `love.mouse`, `love.filesystem`, `love.event` |
+| `options.lua` | Menu for rebinding keys via Moan prompts. | `state`, `Moan`, `controls`, `love.graphics`, `love.keyboard` |
+| `controls.lua` | Loads and saves key bindings to `controls.conf`. | `love.filesystem`, `table` |
+| `assets.lua` | Caches images and fonts to avoid duplicate allocations. | `love.graphics` |
 | `quit.lua` | Exit confirmation dialog with options. | `state`, `Moan`, `love.graphics` |
-| `scripts/gfxload.lua` | Loads images, configures ship animations, and initializes the camera. | `anim8`, `PM7`, `Moan`, `love.graphics`, `love.mouse` |
+| `scripts/gfxload.lua` | Loads images, builds ship animation atlas, and initializes the camera. | `anim8`, `PM7`, `Moan`, `love.graphics`, `love.mouse` |
+| `scripts/benchmark_pm7.lua` | Benchmarks texture memory growth by repeatedly drawing planes and sprites. | `PM7`, `love.graphics`, `love.image` |
 | `lib/playmat.lua` | Mode 7 library: shader, camera setters/getters, sprite placement and rendering buffer. | `love.graphics`, `math`, `table` |
 | `lib/anim8.lua` | Animation helper for sprite sheets. | `love.graphics`, `table` |
 | `lib/moan.lua` | Dialogue system with fonts, audio cues, and typewriter effect. | `utf8`, `love.graphics`, `love.audio`, `table` |
