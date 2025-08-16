@@ -4,6 +4,11 @@ anim8 = require 'lib.anim8'
 Moan = require('lib.moan')
 
 require('planets.data.planets')  -- X, Y  --holds PLANETS
+-- gameplay constants
+local CAMERA_MIN = 4000
+local CAMERA_MAX = 96000
+local SHIP_SPEED = 300  -- base ship speed
+local ANIM_FRAME_TIME = 0.125 -- seconds per frame (8 FPS)
 
 ------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------
@@ -39,7 +44,6 @@ function love.load()
 end
 ------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------
-local speed = 300  --SPEEEEEEEEEEEEEEEEEEED!
 local frame = 0
 local framey = 0
 local frameX = 0
@@ -51,7 +55,7 @@ function love.update(dt)
 
 	Moan.update(dt)
 	frametime = frametime + dt
-	if frametime > 0.125 then  --8 FPS --QUAD CODE
+        if frametime > ANIM_FRAME_TIME then  --8 FPS --QUAD CODE
 	  frametime = 0
 		--FRAME CODES
 		for i,v in pairs(planets) do
@@ -64,7 +68,7 @@ function love.update(dt)
 		end
 	end
 	--  K E Y S  -----------------------------------------------
-	if not (camera.x < 4000 or camera.x > 96000 or camera.y < 4000 or camera.y > 96000) then
+	if not (camera.x < CAMERA_MIN or camera.x > CAMERA_MAX or camera.y < CAMERA_MIN or camera.y > CAMERA_MAX) then
 	  if love.keyboard.isDown("q") then
 	    camera:setRotation(camera:getRotation()-dt)
 			shipROT = -0.5
@@ -73,34 +77,34 @@ function love.update(dt)
 			shipROT = 0.5
 	  end
 	  if love.keyboard.isDown("w") then
-	    camera.x=camera.x+math.cos(camera.r)*speed*dt
-	    camera.y=camera.y+math.sin(camera.r)*speed*dt
+            camera.x=camera.x+math.cos(camera.r)*SHIP_SPEED*dt
+            camera.y=camera.y+math.sin(camera.r)*SHIP_SPEED*dt
 			shipDirection = 1
 			sndSHIP:play()
 	  elseif  love.keyboard.isDown("s") then
-	    camera.x=camera.x-math.cos(camera.r)*speed*dt*0.15
-	    camera.y=camera.y-math.sin(camera.r)*speed*dt*0.15
+            camera.x=camera.x-math.cos(camera.r)*SHIP_SPEED*dt*0.15
+            camera.y=camera.y-math.sin(camera.r)*SHIP_SPEED*dt*0.15
 	  end
 
 	  if love.keyboard.isDown("a") then
-	    camera.x=camera.x+math.cos(camera.r-math.pi/2)*speed*dt*0.15
-	    camera.y=camera.y+math.sin(camera.r-math.pi/2)*speed*dt*0.15
+            camera.x=camera.x+math.cos(camera.r-math.pi/2)*SHIP_SPEED*dt*0.15
+            camera.y=camera.y+math.sin(camera.r-math.pi/2)*SHIP_SPEED*dt*0.15
 	  elseif  love.keyboard.isDown("d") then
-	    camera.x=camera.x+math.cos(camera.r+math.pi/2)*speed*dt*0.15
-	    camera.y=camera.y+math.sin(camera.r+math.pi/2)*speed*dt*0.15
+            camera.x=camera.x+math.cos(camera.r+math.pi/2)*SHIP_SPEED*dt*0.15
+            camera.y=camera.y+math.sin(camera.r+math.pi/2)*SHIP_SPEED*dt*0.15
 	  end
 	else
-		if camera.x < 4000 then
-			camera.x = 4001
+		if camera.x < CAMERA_MIN then
+			camera.x = CAMERA_MIN + 1
 		end
-		if camera.x > 96000 then
-			camera.x = 95999
+		if camera.x > CAMERA_MAX then
+			camera.x = CAMERA_MAX - 1
 		end
-		if 		 camera.y < 4000 then
-			camera.y = 4001
+		if 		 camera.y < CAMERA_MIN then
+			camera.y = CAMERA_MIN + 1
 		end
-		if 		 camera.y > 96000 then
-			camera.y = 95999
+		if 		 camera.y > CAMERA_MAX then
+			camera.y = CAMERA_MAX - 1
 		end
 	end
 
@@ -162,9 +166,9 @@ function love.draw()
 	--CORNER'S OF THE UNiVERSE
 	PM7.placeSprite(camera,spriteimg,5020,5020,0,25,25, 250, 250)  --( CAMERA , IMAGE , X, Y, ROTATION, SX, SY)
 	PM7.placeSprite(camera,spriteimg,0,0,0,25,25, 250, 250)
-	PM7.placeSprite(camera,spriteimg,0,96000,0,25,25, 250, 250)
-	PM7.placeSprite(camera,spriteimg,96000,0,0,25,25, 250, 250)
-	PM7.placeSprite(camera,spriteimg,96000,96000,0,25,25, 250, 250)
+        PM7.placeSprite(camera,spriteimg,0,CAMERA_MAX,0,25,25, 250, 250)
+        PM7.placeSprite(camera,spriteimg,CAMERA_MAX,0,0,25,25, 250, 250)
+        PM7.placeSprite(camera,spriteimg,CAMERA_MAX,CAMERA_MAX,0,25,25, 250, 250)
 	--MOAN LAST
 	Moan.draw()
 end
@@ -191,10 +195,26 @@ end
 function distance(x1, y1, x2, y2) return math.sqrt( (x1-x2)^2 + (y1-y2)^2 ) end
 
 function updateQuadState(a)
-	if a[3] < a[1] then a[3] = a[3] + 1 else
-		a[3] = 0
-		if a[4] < a[2] then a[4] = a[4] + 1 else a[4] = 0 end
-	end
-	if a[4] == a[2] and a[3] == a[5] then a[3] = 0 a[4] = 0 end  --STOP VALUE CODE
-	return a
+        if a[3] < a[1] then a[3] = a[3] + 1 else
+                a[3] = 0
+                if a[4] < a[2] then a[4] = a[4] + 1 else a[4] = 0 end
+        end
+        if a[4] == a[2] and a[3] == a[5] then a[3] = 0 a[4] = 0 end  --STOP VALUE CODE
+        return a
+end
+
+function love.quit()
+    if sndBGMain then
+        sndBGMain:stop()
+        sndBGMain:release()
+        sndBGMain = nil
+    end
+    if sndSHIP then
+        sndSHIP:stop()
+        sndSHIP:release()
+        sndSHIP = nil
+    end
+    if PM7 and PM7.destroyCamera then
+        PM7.destroyCamera()
+    end
 end
