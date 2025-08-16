@@ -9,15 +9,15 @@ Detailed action items derived from the code review and `SUGGESTIONS.md`.  Comple
 - [ ] Prototype a `love.graphics.newSpriteBatch` renderer and compare performance to the current buffer approach.
 
 ## Global State Cleanup
-- [ ] Convert `scripts/gfxload.lua` into a module that returns images, animations, and a `setupCamera` function instead of setting globals.
-- [ ] Replace `lib/switch.lua` and `passvar` with a state manager that passes arguments explicitly.  Update `main.lua`, `info.lua`, and `planets/*.lua` accordingly.
+- [x] Convert `scripts/gfxload.lua` into a module that returns images, animations, and a `setupCamera` function instead of setting globals.
+- [x] Replace `lib/switch.lua` and `passvar` with a state manager that passes arguments explicitly.  Update `main.lua`, `info.lua`, and `planets/*.lua` accordingly.
 - [ ] Implement a `Planet` handler module so individual `planets/planet*.lua` scripts can be data‑driven.
 
 ## Asset Management
-- [ ] Introduce an `assets.lua` cache.  Modify `planets/data/planets.lua` and `scripts/gfxload.lua` to request images through this cache.
+- [x] Introduce an `assets.lua` cache.  Modify `planets/data/planets.lua` and `scripts/gfxload.lua` to request images through this cache.
 - [x] Add shutdown code in `main.lua` to stop and release `sndBGMain` and `sndSHIP`.
 - [ ] Merge sprite sheets into atlases and update `anim8.newGrid` calls to use atlas coordinates.
-- [ ] Track and reuse fonts (`JPfallback.ttf`, `Pixel UniCode.ttf`) through the asset cache.
+- [x] Track and reuse fonts (`JPfallback.ttf`, `Pixel UniCode.ttf`) through the asset cache.
 
 ## Code Structure and Documentation
 - [ ] Replace duplicated planet scripts with a generic `planet_scene.lua` that reads quest/dialogue data from `planets/data/planets.lua`.

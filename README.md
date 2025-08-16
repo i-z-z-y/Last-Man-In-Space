@@ -34,9 +34,8 @@ Every Lua source file was inspected to catalogue third‑party code and the exac
   and `Moan.keyreleased` in planet scripts and the quit screen.  The library also exposes configuration fields such as
   `Moan.font`, `Moan.typeSound`, and `Moan.optionOnSelectSound` that are initialised in `main.lua`, and `Moan.setSpeed` to slow
   text output for the OJEE teleporter dialogue.
-* **Switch** (`lib/switch.lua`) – Minimal state machine.  `state.switch("file;args")` dynamically reloads a Lua module and
-  populates a global `passvar` with trailing semicolon‑delimited arguments.  Planet scripts read `passvar` to obtain the planet
-  key and quest information.
+* **State Manager** (`lib/state.lua`) – Minimal state loader that reloads a module and invokes it with explicit arguments,
+  eliminating the previous global `passvar` table.  Planet and menu scripts receive their parameters directly.
 * **utf8** – Required by `lib/moan.lua` to support multi‑byte text rendering in dialogue.
 
 ## Lua Files and Dependencies
@@ -44,14 +43,14 @@ Every Lua source file was inspected to catalogue third‑party code and the exac
 | File | Purpose | Libraries and APIs |
 | --- | --- | --- |
 | `conf.lua` | Configures window title, resize behaviour, and fullscreen. | `love.conf` |
-| `info.lua` | Shows coordinates and planet name using values from `passvar`. | `state`, `love.graphics`, `love.keyboard` |
+| `info.lua` | Shows coordinates and planet name passed in explicitly. | `state`, `love.graphics`, `love.keyboard` |
 | `main.lua` | Game loop, camera control, audio, and Mode 7 drawing. | `state`, `PM7`, `anim8`, `Moan`, `love.graphics`, `love.audio`, `love.keyboard`, `love.math`, `love.event` |
 | `quit.lua` | Exit confirmation dialog with options. | `state`, `Moan`, `love.graphics` |
 | `scripts/gfxload.lua` | Loads images, configures ship animations, and initializes the camera. | `anim8`, `PM7`, `Moan`, `love.graphics`, `love.mouse` |
 | `lib/playmat.lua` | Mode 7 library: shader, camera setters/getters, sprite placement and rendering buffer. | `love.graphics`, `math`, `table` |
 | `lib/anim8.lua` | Animation helper for sprite sheets. | `love.graphics`, `table` |
 | `lib/moan.lua` | Dialogue system with fonts, audio cues, and typewriter effect. | `utf8`, `love.graphics`, `love.audio`, `table` |
-| `lib/switch.lua` | Minimal state loader that populates the global `passvar` table. | `string`, `package` |
+| `lib/state.lua` | Minimal state loader that calls modules with explicit arguments. | `string`, `package` |
 | `planets/planetAndros.lua` | Handles home planet quest stages, triggers explosions, and toggles `planets[k].live`. | `state`, `Moan`, `love.graphics`, `love.event` |
 | `planets/planetGreen.lua` | Sets `shipQUEST` stages, uploads signals, and ends the game on success. | `state`, `Moan`, `love.graphics`, `love.event` |
 | `planets/planetPink.lua` | Provides coordinates to Planet Green and advances quest progression. | `state`, `Moan`, `love.graphics`, `love.event` |
