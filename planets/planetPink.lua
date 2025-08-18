@@ -14,7 +14,7 @@ return scene({
             {lines={"Maybe PLANET PURPLE knows how to help us."}, oncomplete=function() state.switch('game') end}
         },
         [2] = {
-            {before=function() shipQUEST = 3 end,
+            {before=function() setShipQuest(3) end,
              lines={"Our planet is in great peril...you'll find an old friend on your old home PLANET ANDROS that might be able to help..."}},
             {lines={"Can you...--SAVE US?"}, oncomplete=function() state.switch('game') end}
         },

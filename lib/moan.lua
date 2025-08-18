@@ -391,11 +391,15 @@ function Moan.draw()
 
     -- Message options (when shown)
     if Moan.showingOptions and typing == false then
-      for k, option in pairs(Moan.allMsgs[Moan.currentMsgInstance].options) do
-        -- First option has no Y padding... KKK01
-        --11/2/2018 MODiFiED ORiGiNAL LiB -- ADD Y PADDiNG CUZ MAKE LOOK PRETTY BETTER!!!
+      for k, option in ipairs(Moan.allMsgs[Moan.currentMsgInstance].options) do
+        if k == Moan.currentOption then
+          love.graphics.setColor(1,1,0,1)
+        else
+          love.graphics.setColor(fontColour)
+        end
         love.graphics.print(option[1], textX+padding, optionsY+((k-0.5)*optionsSpace))
       end
+      love.graphics.setColor(fontColour)
     end
 
     -- Next message/continue indicator

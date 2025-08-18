@@ -1,3 +1,5 @@
+package.path = package.path .. ';../?.lua;../?/init.lua'
+
 local PM7 = require('lib.playmat')
 
 local function createTestImage()
@@ -6,24 +8,29 @@ local function createTestImage()
     return love.graphics.newImage(data)
 end
 
-local function benchmark()
+local function runBenchmark(name, renderFn)
     local cam = PM7.newCamera(800,600)
     local img = createTestImage()
-
-    local before = love.graphics.getStats()
-    for i=1,100 do
-        PM7.drawPlane(cam, img)
-    end
-    local afterPlane = love.graphics.getStats()
-
     for i=1,100 do
         PM7.placeSprite(cam, img, i*10, i*10, 0, 1, 1)
     end
-    PM7.renderSprites(cam)
-    local afterSprites = love.graphics.getStats()
-
-    print(string.format('texture memory before=%d afterPlane=%d afterSprites=%d',
-        before.texturememory, afterPlane.texturememory, afterSprites.texturememory))
+    local t = love.timer.getTime()
+    renderFn(cam)
+    local elapsed = love.timer.getTime() - t
+    local stats = love.graphics.getStats()
+    print(string.format('%s: time=%.6f drawcalls=%d texture=%d', name, elapsed, stats.drawcalls, stats.texturememory))
 end
 
-return { run = benchmark }
+local function benchmark()
+    runBenchmark('renderSprites', PM7.renderSprites)
+    runBenchmark('renderSpritesBatch', PM7.renderSpritesBatch)
+end
+
+if ... == nil then
+    function love.load()
+        benchmark()
+        love.event.quit()
+    end
+else
+    return { run = benchmark }
+end

@@ -8,12 +8,12 @@ return scene({
     },
     dialogue = {
         [0] = {
-            {before=function() shipQUEST = 1 end,
+            {before=function() setShipQuest(1) end,
              lines={[=[Our planet is in great peril... our sisters on PLANET PURPLE might be able to help, but we can't get too close because they're made of green anti-matter..]=]}},
             {lines={"Can you...--SAVE US?"}, oncomplete=function() state.switch('game') end}
         },
         [6] = {
-            {before=function() shipQUEST = 7 end,
+            {before=function() setShipQuest(7) end,
              lines={"We heard you are searching for someone on your old home planet...--You'll need to transmit a secret signal...--We're uploading it to your ship now..--It should help you find your friend on PLANET ANDROS."}},
             {lines={"PLEASE, HURRY!"}, oncomplete=function() state.switch('game') end}
         },
