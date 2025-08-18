@@ -4,6 +4,7 @@ local anim8 = require 'lib.anim8'
 local Moan = require('lib.moan')
 local assets = require("assets")
 local controls = require('controls')
+local json = require('lib.dkjson')
 
 planets = require('planets.data.planets')
 -- gameplay constants
@@ -24,24 +25,11 @@ local shipROT = 0
 local shipOFF = 200
 local camVX, camVY = 0, 0 -- camera velocity
 
-local function serialize(tbl, indent)
-        indent = indent or ""
-        local nextIndent = indent .. "  "
-        local parts = {"{\n"}
-        for k,v in pairs(tbl) do
-                local key = type(k) == "string" and string.format('%q', k) or k
-                table.insert(parts, nextIndent .. "[" .. key .. "] = ")
-                if type(v) == "table" then
-                        table.insert(parts, serialize(v, nextIndent))
-                elseif type(v) == "string" then
-                        table.insert(parts, string.format('%q', v))
-                else
-                        table.insert(parts, tostring(v))
-                end
-                table.insert(parts, ",\n")
+local function backupFile(name)
+        if love.filesystem.getInfo(name) then
+                local data = love.filesystem.read(name)
+                if data then love.filesystem.write(name .. '.bak', data) end
         end
-        table.insert(parts, indent .. "}")
-        return table.concat(parts)
 end
 
 local function saveProgress()
@@ -50,20 +38,21 @@ local function saveProgress()
         for k,v in pairs(planets) do
                 if v.visited then data.visited[k] = true end
         end
-        love.filesystem.write('save.lua', 'return ' .. serialize(data))
+        backupFile('save.json')
+        love.filesystem.write('save.json', json.encode(data, {indent=true}))
 end
 
 local function loadProgress()
-        local chunk = love.filesystem.load('save.lua')
-        if chunk then
-                local ok, data = pcall(chunk)
-                if ok and type(data) == 'table' then
-                        shipQUEST = data.shipQUEST or shipQUEST
-                        if data.camera then
-                                camera.x = data.camera.x or camera.x
-                                camera.y = data.camera.y or camera.y
+        local content = love.filesystem.read('save.json')
+        if content then
+                local data, _, err = json.decode(content)
+                if not err and type(data) == 'table' then
+                        if type(data.shipQUEST) == 'number' then shipQUEST = data.shipQUEST end
+                        if type(data.camera) == 'table' then
+                                camera.x = tonumber(data.camera.x) or camera.x
+                                camera.y = tonumber(data.camera.y) or camera.y
                         end
-                        if data.visited then
+                        if type(data.visited) == 'table' then
                                 for k,_ in pairs(data.visited) do
                                         if planets[k] then planets[k].visited = true end
                                 end
@@ -296,8 +285,11 @@ function love.quit()
         sndSHIP:release()
         sndSHIP = nil
     end
-    if PM7 and PM7.destroyCamera then
+    if PM7 and PM7.destroyCamera then -- free Playmat resources
         PM7.destroyCamera()
+    end
+    if assets and assets.clear then
+        assets.clear()
     end
 end
 

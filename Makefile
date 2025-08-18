@@ -3,7 +3,7 @@ LOVE_VERSION ?= 11.5
 LINUX_URL := https://github.com/love2d/love/releases/download/$(LOVE_VERSION)/love-$(LOVE_VERSION)-linux-x86_64.tar.gz
 MAC_URL := https://github.com/love2d/love/releases/download/$(LOVE_VERSION)/love-$(LOVE_VERSION)-macos.zip
 
-love: $(LOVE_FILE)
+love: test $(LOVE_FILE)
 
 $(LOVE_FILE):
 	zip -9 -r $(LOVE_FILE) . -x "*.git*" "$(LOVE_FILE)"
@@ -21,7 +21,12 @@ mac: $(LOVE_FILE)
 	cp $(LOVE_FILE) dist/macos/love.app/Contents/Resources/
 
 clean:
-	rm -f $(LOVE_FILE)
-	rm -rf dist dist/love-mac.zip
+        rm -f $(LOVE_FILE)
+        rm -rf dist dist/love-mac.zip
 
-.PHONY: love linux mac clean
+test:
+	luacheck .
+	python3 scripts/validate_planets.py
+	busted
+
+.PHONY: love linux mac clean test

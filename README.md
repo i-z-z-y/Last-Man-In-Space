@@ -12,7 +12,6 @@ The project was examined file by file.  Key modules include:
 - `options.lua` – in‑game menu for rebinding keys.
 - `controls.lua` – persistent key bindings stored in `controls.conf` using `love.filesystem`.
 - `assets.lua` – image and font cache so resources are only created once.
-- `info.lua` – displays coordinates and planet name.
 - `quit.lua` – exit confirmation screen.
 - `scripts/` – utility scripts such as `gfxload.lua` (graphics loader/camera factory), `benchmark_pm7.lua` (Playmat memory benchmark) and `validate_planets.py` (dataset validator).
 - `planets/` – individual Lua files for each planet or asteroid and a `data/planets.lua` dataset describing their positions and sprites.
@@ -51,7 +50,6 @@ Every Lua source file was inspected to catalogue third‑party code and the exac
 | File | Purpose | Libraries and APIs |
 | --- | --- | --- |
 | `conf.lua` | Configures window title, resize behaviour, and fullscreen. | `love.conf` |
-| `info.lua` | Shows coordinates and planet name passed in explicitly. | `state`, `love.graphics`, `love.keyboard` |
 | `main.lua` | Entry point that loads the title screen. | `state` |
 | `title.lua` | Basic menu for starting the game, rebinding controls, or quitting. | `state`, `love.graphics`, `love.keyboard`, `love.event` |
 | `game.lua` | Ship movement, camera control, save/load, Mode 7 drawing, and audio playback. | `state`, `PM7`, `anim8`, `Moan`, `assets`, `controls`, `love.graphics`, `love.audio`, `love.keyboard`, `love.math`, `love.mouse`, `love.filesystem`, `love.event` |
@@ -83,6 +81,23 @@ Ensure [LÖVE](https://love2d.org/) is installed and run the game from the repos
 ```bash
 love .
 ```
+Python 3 and the [Pillow](https://python-pillow.org/) library are required for the validation scripts and tooling.
+
+## Controls Configuration
+
+Key bindings are saved to `controls.conf` in JSON format. Each entry maps an action name to a LÖVE key string. Defaults are:
+
+| Action | Key |
+| --- | --- |
+| up | w |
+| down | s |
+| left | a |
+| right | d |
+| turnLeft | q |
+| turnRight | e |
+| action | f |
+
+Deleting the file restores the default mappings.
 
 ## Quest Progression
 

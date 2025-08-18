@@ -3,6 +3,18 @@ local Moan = require('lib.moan')
 local assets = require('assets')
 local planets = require('planets.data.planets')
 
+--[[
+`config` table fields:
+  avatar   – path to an image shown next to dialogue
+  intro    – array of dialogue entry tables run on first visit
+  dialogue – table keyed by `shipQUEST` stage with arrays of entries
+
+Each dialogue entry may contain:
+  lines       – array of strings displayed by Moan
+  before(p)   – optional callback executed before the lines are shown
+  oncomplete  – optional callback after the entry finishes
+]]
+
 return function(config)
     return function(XY)
         XY = tostring(XY)

@@ -20,6 +20,7 @@ function M.load()
     love.graphics.draw(imgSHIP1,imgSHIP0:getWidth(),0)
     love.graphics.setCanvas()
     local atlas = love.graphics.newImage(atlasCanvas:newImageData())
+    atlasCanvas:release()
     imgSHIP0:release()
     imgSHIP1:release()
 
