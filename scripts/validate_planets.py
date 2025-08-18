@@ -42,6 +42,15 @@ def parse_planets():
                 m = re.search(r'quadHeight=(\d+)', stripped)
                 if m:
                     current['quadHeight'] = int(m.group(1))
+                m = re.search(r'imgSX=(\d+)', stripped)
+                if m:
+                    current['imgSX'] = int(m.group(1))
+                m = re.search(r'imgSY=(\d+)', stripped)
+                if m:
+                    current['imgSY'] = int(m.group(1))
+                m = re.search(r'quadState=\{([^}]+)\}', stripped)
+                if m:
+                    current['quadState'] = [int(n) for n in m.group(1).split(',')]
     return entries
 
 
@@ -49,7 +58,7 @@ def validate(entries):
     """Validate parsed entries and return True if all checks pass."""
     ok = True
     for idx, entry in enumerate(entries):
-        missing = [k for k in ('img', 'imgPS', 'quadWidth', 'quadHeight') if k not in entry]
+        missing = [k for k in ('img', 'imgPS', 'quadWidth', 'quadHeight', 'imgSX', 'imgSY', 'quadState') if k not in entry]
         if missing:
             print(f"Entry {idx} missing fields: {', '.join(missing)}")
             ok = False
@@ -70,6 +79,13 @@ def validate(entries):
         imgps_path = os.path.join(ROOT, entry['imgPS'])
         if not os.path.exists(imgps_path):
             print(f"Planet screen image not found: {imgps_path}")
+            ok = False
+        qs = entry['quadState']
+        if not (len(qs) >= 5 and qs[2] < qs[0] and qs[3] < qs[1] and qs[4] <= qs[1]):
+            print(f"Invalid quadState for entry {idx}: {qs}")
+            ok = False
+        if not (1 <= entry['imgSX'] <= 100 and 1 <= entry['imgSY'] <= 100):
+            print(f"imgSX/imgSY out of range for entry {idx}: {entry['imgSX']}x{entry['imgSY']}")
             ok = False
     return ok
 

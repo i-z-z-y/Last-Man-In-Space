@@ -1,3 +1,5 @@
+local json = require('lib.dkjson')
+
 local defaults = {
     up = 'w',
     down = 's',
@@ -11,42 +13,60 @@ local defaults = {
 local controls = {}
 local fileName = 'controls.conf'
 
-local function serialize(tbl)
-    local parts = {'{'}
-    local first = true
-    for k,v in pairs(tbl) do
-        if not first then table.insert(parts, ',') end
-        first = false
-        table.insert(parts, string.format("[%q]=%q", k, v))
+local function mergeDefaults()
+    for k,v in pairs(defaults) do
+        if controls[k] == nil then controls[k] = v end
     end
-    table.insert(parts, '}')
-    return table.concat(parts)
 end
 
 function controls.load()
-    local chunk = love.filesystem.load(fileName)
-    if chunk then
-        local ok, data = pcall(chunk)
-        if ok and type(data) == 'table' then
-            for k,v in pairs(data) do controls[k]=v end
+    local content = love.filesystem.read(fileName)
+    if content then
+        local data, _, err = json.decode(content)
+        if not err and type(data) == 'table' then
+            for k,v in pairs(data) do controls[k] = v end
         end
     end
-    for k,v in pairs(defaults) do
-        if not controls[k] then controls[k] = v end
-    end
+    mergeDefaults()
 end
 
 function controls.save()
-    love.filesystem.write(fileName, 'return '..serialize(controls))
+    local encoded = json.encode(controls.all(), {indent=true})
+    love.filesystem.write(fileName, encoded)
 end
 
 function controls.get(action)
     return controls[action]
 end
 
+--- Set an action to a new key.
+-- Returns true on success or false plus conflicting action name.
 function controls.set(action, key)
+    for k,v in pairs(controls) do
+        if k ~= action and v == key then
+            return false, k
+        end
+    end
     controls[action] = key
     controls.save()
+    return true
 end
+
+function controls.reset()
+    for k,v in pairs(defaults) do controls[k] = v end
+    controls.save()
+end
+
+function controls.all()
+    local copy = {}
+    for k,v in pairs(controls) do
+        if type(v) == 'string' then
+            copy[k] = v
+        end
+    end
+    return copy
+end
+
+mergeDefaults()
 
 return controls

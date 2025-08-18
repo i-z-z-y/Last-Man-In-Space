@@ -21,4 +21,18 @@ function assets.font(path, size)
     return bucket[size]
 end
 
+function assets.clear()
+    for k,img in pairs(assets.images) do
+        if img.release then img:release() end
+        assets.images[k] = nil
+    end
+    for path,bucket in pairs(assets.fonts) do
+        for size,font in pairs(bucket) do
+            if font.release then font:release() end
+            bucket[size] = nil
+        end
+        assets.fonts[path] = nil
+    end
+end
+
 return assets
