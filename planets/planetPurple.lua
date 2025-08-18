@@ -8,7 +8,7 @@ return scene({
     },
     dialogue = {
         [1] = {
-            {before=function() shipQUEST = 2 end,
+            {before=function() setShipQuest(2) end,
              lines={"Our planet is in great peril...our sisters on PLANET P!NK might be able to help, but we can't get too close because they're made of purple anti-matter.."}},
             {lines={"Can you...--SAVE US?"}, oncomplete=function() state.switch('game') end}
         },

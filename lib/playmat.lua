@@ -290,8 +290,6 @@ PM.drawPlane = drawPlane
 PM.toScreen = toScreen
 PM.toWorld = toWorld
 PM.placeSprite = placeSprite
-PM.renderSprites = renderSprites
-
 -- experimental spritebatch renderer for benchmarking
 local function renderSpritesBatch(cam)
         if cam.buffer and #cam.buffer > 0 then
@@ -336,6 +334,6 @@ local function renderSpritesBatch(cam)
         end
 end
 
-PM.renderSpritesBatch = renderSpritesBatch
+PM.renderSprites = renderSpritesBatch
 
 return PM

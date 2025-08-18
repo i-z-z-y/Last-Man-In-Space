@@ -5,25 +5,28 @@ local Moan = require('lib.moan')
 local assets = require("assets")
 local controls = require('controls')
 local json = require('lib.dkjson')
+local config = require('config')
 
 planets = require('planets.data.planets')
--- gameplay constants
-local CAMERA_MIN = 4000
-local CAMERA_MAX = 96000
-local SHIP_SPEED = 300  -- base ship speed
-local ANIM_FRAME_TIME = 0.125 -- seconds per frame (8 FPS)
-local CAMERA_SMOOTHING = 5 -- camera acceleration factor
 
 local imgPLANE7, imgBG, spriteimg, imgCOMPASS, imgSHIP0, imgSHIP1
 local aniSHIP0, aniSHIP1
 local camera
-local sndBGMain, sndSHIP
+local sndBGMain, sndSHIP, sndQuest
 
 shipQUEST = shipQUEST or 0
 local shipDirection = 0
 local shipROT = 0
 local shipOFF = 200
 local camVX, camVY = 0, 0 -- camera velocity
+
+function setShipQuest(newValue)
+    if newValue > shipQUEST and sndQuest then
+        sndQuest:stop()
+        sndQuest:play()
+    end
+    shipQUEST = newValue
+end
 
 local function backupFile(name)
         if love.filesystem.getInfo(name) then
@@ -86,6 +89,8 @@ local function setup()
         sndBGMain:play()
         sndSHIP = love.audio.newSource("assets/propulsion.wav", "static")
         sndSHIP:setVolume(0.1)
+        sndQuest = love.audio.newSource("assets/optionSelect.wav", "static")
+        sndQuest:setVolume(0.2)
         Moan.font = assets.font("assets/JPfallback.ttf", 32)
         local JPfallback = assets.font("assets/Pixel UniCode.ttf", 32)
         Moan.font:setFallbacks(JPfallback)
@@ -114,7 +119,7 @@ function love.update(dt)
 
         Moan.update(dt)
         frametime = frametime + dt
-        if frametime > ANIM_FRAME_TIME then  --8 FPS --QUAD CODE
+        if frametime > config.ANIM_FRAME_TIME then  --8 FPS --QUAD CODE
           frametime = 0
                 --FRAME CODES
                 for i,v in pairs(planets) do
@@ -127,7 +132,7 @@ function love.update(dt)
                 end
         end
         --  K E Y S  -----------------------------------------------
-        local outOfBounds = camera.x < CAMERA_MIN or camera.x > CAMERA_MAX or camera.y < CAMERA_MIN or camera.y > CAMERA_MAX
+        local outOfBounds = camera.x < config.CAMERA_MIN or camera.x > config.CAMERA_MAX or camera.y < config.CAMERA_MIN or camera.y > config.CAMERA_MAX
         local targetVX, targetVY = 0, 0
         if not outOfBounds then
           if love.keyboard.isDown(controls.get('turnLeft')) then
@@ -138,44 +143,44 @@ function love.update(dt)
             shipROT = 0.5
           end
           if love.keyboard.isDown(controls.get('up')) then
-            targetVX = targetVX + math.cos(camera.r)*SHIP_SPEED
-            targetVY = targetVY + math.sin(camera.r)*SHIP_SPEED
+            targetVX = targetVX + math.cos(camera.r)*config.SHIP_SPEED
+            targetVY = targetVY + math.sin(camera.r)*config.SHIP_SPEED
             shipDirection = 1
             sndSHIP:play()
           elseif love.keyboard.isDown(controls.get('down')) then
-            targetVX = targetVX - math.cos(camera.r)*SHIP_SPEED*0.15
-            targetVY = targetVY - math.sin(camera.r)*SHIP_SPEED*0.15
+            targetVX = targetVX - math.cos(camera.r)*config.SHIP_SPEED*0.15
+            targetVY = targetVY - math.sin(camera.r)*config.SHIP_SPEED*0.15
           end
 
           if love.keyboard.isDown(controls.get('left')) then
-            targetVX = targetVX + math.cos(camera.r-math.pi/2)*SHIP_SPEED*0.15
-            targetVY = targetVY + math.sin(camera.r-math.pi/2)*SHIP_SPEED*0.15
+            targetVX = targetVX + math.cos(camera.r-math.pi/2)*config.SHIP_SPEED*0.15
+            targetVY = targetVY + math.sin(camera.r-math.pi/2)*config.SHIP_SPEED*0.15
           elseif love.keyboard.isDown(controls.get('right')) then
-            targetVX = targetVX + math.cos(camera.r+math.pi/2)*SHIP_SPEED*0.15
-            targetVY = targetVY + math.sin(camera.r+math.pi/2)*SHIP_SPEED*0.15
+            targetVX = targetVX + math.cos(camera.r+math.pi/2)*config.SHIP_SPEED*0.15
+            targetVY = targetVY + math.sin(camera.r+math.pi/2)*config.SHIP_SPEED*0.15
           end
         end
 
-        camVX = camVX + (targetVX - camVX) * CAMERA_SMOOTHING * dt
-        camVY = camVY + (targetVY - camVY) * CAMERA_SMOOTHING * dt
+        camVX = camVX + (targetVX - camVX) * config.CAMERA_SMOOTHING * dt
+        camVY = camVY + (targetVY - camVY) * config.CAMERA_SMOOTHING * dt
 
         camera.x = camera.x + camVX * dt
         camera.y = camera.y + camVY * dt
 
-        if camera.x < CAMERA_MIN then
-            camera.x = CAMERA_MIN + 1
+        if camera.x < config.CAMERA_MIN then
+            camera.x = config.CAMERA_MIN + 1
             camVX = 0
         end
-        if camera.x > CAMERA_MAX then
-            camera.x = CAMERA_MAX - 1
+        if camera.x > config.CAMERA_MAX then
+            camera.x = config.CAMERA_MAX - 1
             camVX = 0
         end
-        if camera.y < CAMERA_MIN then
-            camera.y = CAMERA_MIN + 1
+        if camera.y < config.CAMERA_MIN then
+            camera.y = config.CAMERA_MIN + 1
             camVY = 0
         end
-        if camera.y > CAMERA_MAX then
-            camera.y = CAMERA_MAX - 1
+        if camera.y > config.CAMERA_MAX then
+            camera.y = config.CAMERA_MAX - 1
             camVY = 0
         end
 
@@ -236,9 +241,9 @@ function love.draw()
         --CORNER'S OF THE UNiVERSE
         PM7.placeSprite(camera,spriteimg,5020,5020,0,25,25, 250, 250)  --( CAMERA , IMAGE , X, Y, ROTATION, SX, SY)
         PM7.placeSprite(camera,spriteimg,0,0,0,25,25, 250, 250)
-        PM7.placeSprite(camera,spriteimg,0,CAMERA_MAX,0,25,25, 250, 250)
-        PM7.placeSprite(camera,spriteimg,CAMERA_MAX,0,0,25,25, 250, 250)
-        PM7.placeSprite(camera,spriteimg,CAMERA_MAX,CAMERA_MAX,0,25,25, 250, 250)
+        PM7.placeSprite(camera,spriteimg,0,config.CAMERA_MAX,0,25,25, 250, 250)
+        PM7.placeSprite(camera,spriteimg,config.CAMERA_MAX,0,0,25,25, 250, 250)
+        PM7.placeSprite(camera,spriteimg,config.CAMERA_MAX,config.CAMERA_MAX,0,25,25, 250, 250)
         --MOAN LAST
         Moan.draw()
 end
@@ -284,6 +289,11 @@ function love.quit()
         sndSHIP:stop()
         sndSHIP:release()
         sndSHIP = nil
+    end
+    if sndQuest then
+        sndQuest:stop()
+        sndQuest:release()
+        sndQuest = nil
     end
     if PM7 and PM7.destroyCamera then -- free Playmat resources
         PM7.destroyCamera()

@@ -54,13 +54,9 @@ return function(XY)
 
   function love.keyreleased(key)
     Moan.keyreleased(key)
-     if key == "0" then
-       Moan.clearMessages()
-       state.switch("game")
-     end
-     if key == "escape" then
-        Moan.clearMessages()
-        state.switch("game")
-      end
+    if key == "0" or key == "escape" then
+      Moan.clearMessages()
+      state.switch("game")
+    end
   end
 end
