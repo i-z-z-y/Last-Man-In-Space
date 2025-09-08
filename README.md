@@ -116,7 +116,7 @@ updates the value when visited in a particular order:
 
 ## Player Feedback
 
-Comments from the Ludum Dare 57 thread highlighted several areas for improvement:
+Comments from the Ludum Dare 42 thread highlighted several areas for improvement:
 
 * Movement feels abrupt at short distances because the camera snaps instantly to new positions.
 * Some players were unsure of the controls or objective until experimenting.
